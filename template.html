@@ -1,0 +1,49 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>접수중 공모전 모음</title>
+<style>
+:root{--bg:#fff;--text:#111;--t2:#4a4a4a;--t3:#888;--accent:#3182F6;--border:rgba(0,0,0,.09);--chip:#f3f5f8;--hot:#e5484d}
+@media(prefers-color-scheme:dark){:root{--bg:#111;--text:#f2f2f2;--t2:#bbb;--t3:#888;--border:rgba(255,255,255,.12);--chip:#1e1e1e}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:'Pretendard Variable','Pretendard',-apple-system,'Apple SD Gothic Neo','맑은 고딕',sans-serif}
+.w{max-width:860px;margin:0 auto;padding:28px 16px 80px}
+h1{font-size:24px;margin:0 0 4px}.sub{color:var(--t3);font-size:13px;margin-bottom:18px;line-height:1.5}
+.bar{position:sticky;top:0;background:var(--bg);padding:10px 0;border-bottom:1px solid var(--border);z-index:2}
+input{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font:inherit;background:var(--bg);color:var(--text)}
+.tabs{display:flex;gap:4px;overflow-x:auto;margin-top:10px;padding-bottom:2px}
+.tab{flex:none;border:0;background:none;color:var(--t2);padding:8px 12px;border-radius:10px;font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+.tab b{font-weight:600;color:var(--t3);margin-left:4px;font-size:12px}
+.tab.on{background:var(--accent);color:#fff}.tab.on b{color:#fff;opacity:.85}
+.opts{margin-top:8px;display:flex;gap:14px;font-size:13px;color:var(--t2)}.opts label{cursor:pointer}
+.g{margin:22px 0 6px;font-weight:700;font-size:15px}.g.hot{color:var(--hot)}.g span{color:var(--t3);font-weight:400;font-size:13px;margin-left:6px}
+.r{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--border)}
+.d{flex:none;width:52px;text-align:center;font-weight:700;font-size:14px;padding:5px 0;border-radius:8px;background:var(--chip)}
+.d.hot{background:var(--hot);color:#fff}
+.t{font-size:15px;line-height:1.4}.m{color:var(--t3);font-size:12.5px;margin-top:3px}
+.s{margin-top:6px;display:flex;gap:6px;flex-wrap:wrap}.s a{font-size:12px;padding:3px 9px;border-radius:99px;background:var(--chip);color:var(--accent);text-decoration:none}.s a:hover{background:var(--accent);color:#fff}
+</style></head><body><div class="w">
+<h1>접수중 공모전 모음</h1>
+<div class="sub">업데이트 __UPDATED__ (매일 자동 갱신) · 출처: 위비티·콘테스트코리아·씽유 · 마감일은 D-day로 계산한 값이니 원문에서 재확인</div>
+<div class="bar"><input id="q" placeholder="제목·주최 검색"><div class="tabs" id="tabs"></div>
+<div class="opts"><label><input type="checkbox" id="soon" style="width:auto"> 7일 이내 마감만</label></div></div>
+<div id="list"></div></div>
+<script>
+const D=__DATA__,CATS=__CATS__;
+let cat='전체',q='',soon=false;
+const tabs=document.getElementById('tabs');
+const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+function base(){return D.filter(x=>(!q||(x.t+x.o).toLowerCase().includes(q))&&(!soon||x.n<=7))}
+function render(){
+ const b=base();
+ tabs.innerHTML=['전체',...CATS].map(c=>{const n=c==='전체'?b.length:b.filter(x=>x.c.includes(c)).length;return `<button class="tab ${c===cat?'on':''}" data-c="${c}">${c}<b>${n}</b></button>`}).join('');
+ tabs.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{cat=t.dataset.c;render()});
+ const f=b.filter(x=>cat==='전체'||x.c.includes(cat));
+ const G=[['오늘 마감',x=>x.n===0,1],['내일 마감',x=>x.n===1,1],['7일 이내',x=>x.n>=2&&x.n<=7],['8~14일',x=>x.n>=8&&x.n<=14],['15일 이후',x=>x.n>=15]];
+ let h='';
+ G.forEach(([name,fn,hot])=>{const it=f.filter(fn);if(!it.length)return;
+  h+=`<div class="g ${hot?'hot':''}">${name}<span>${it.length}건</span></div>`;
+  it.forEach(x=>{h+=`<div class="r"><div class="d ${hot?'hot':''}">${x.n===0?'D-day':'D-'+x.n}</div><div><div class="t">${esc(x.t)}</div><div class="m">${esc(x.o)} · ~${x.dl.slice(5).replace('-','/')} · ${x.c.join(', ')}</div><div class="s">${x.s.map(s=>`<a target="_blank" rel="noopener" href="${s[1]}">${s[0]}</a>`).join('')}</div></div></div>`})});
+ document.getElementById('list').innerHTML=h||'<p class="m">결과 없음</p>';
+}
+document.getElementById('q').oninput=e=>{q=e.target.value.trim().toLowerCase();render()};
+document.getElementById('soon').onchange=e=>{soon=e.target.checked;render()};
+render();
+</script></body></html>
